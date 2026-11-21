@@ -1,0 +1,8 @@
+# Compiled binaries
+batch_edge_detector
+*.o
+*.out
+
+# Auto-downloaded single-header libraries
+src/stb_image.h
+src/stb_image_write.h
