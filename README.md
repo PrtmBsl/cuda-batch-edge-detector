@@ -36,3 +36,14 @@ chmod +x run.sh
 * **Shared Memory Halo Tiling**: Moving 5×5 neighborhood reads from global memory into `__shared__` memory reduced redundant memory transactions by ~25× per pixel block, yielding substantial kernel speedups on 1080p and 4K resolutions while maintaining `<= 1` uint8 rounding difference versus the CPU reference.
 * **Host-to-Device Transfer Overhead**: Profiling with `cudaEvent_t` revealed that PCIe `cudaMemcpy` calls account for a large share of total wall-clock runtime on smaller images.
 * **Next Steps**: Implement **CUDA Streams** with pinned host memory (`cudaMallocHost`) to overlap `cudaMemcpyAsync` transfers of image $N+1$ with kernel execution on image $N$.
+
+## Experimental Benchmark Results (NVIDIA Tesla T4, CUDA 13.0)
+Executed in a single batch run across 5 resolutions (`640x480` through `3840x2160`):
+
+| Image | Resolution | CPU Time (ms) | GPU Kernel (ms) | GPU Total w/ PCIe (ms) | Kernel Speedup |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| `sample_01_sd.png` | 640×480 | 19.87 | 0.36 | 1.77 | 55.93× |
+| `sample_02_hd.png` | 1280×720 | 66.41 | 0.23 | 1.25 | 286.49× |
+| `sample_03_fhd.png` | 1920×1080 | 144.95 | 0.51 | 2.45 | 283.14× |
+| `sample_04_qhd.png` | 2560×1440 | 261.19 | 0.93 | 4.63 | 279.40× |
+| `sample_05_4k.png` | 3840×2160 | 360.63 | 2.06 | 9.39 | 175.33× |
